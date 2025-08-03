@@ -104,7 +104,7 @@ document.addEventListener("DOMContentLoaded", () => {
         "profile-form-container"
       ),
       navButtons: document.querySelectorAll(".bnav"),
-      backButton: document.getElementById("btn_back"),
+      backButton: document.querySelectorAll(".btn_back"),
       contentPages: document.querySelectorAll(".page_content"),
       logoutButton: document.getElementById("btn_logout"),
       missionListContainer: document.getElementById("mission_list"),
@@ -148,6 +148,10 @@ document.addEventListener("DOMContentLoaded", () => {
       videoContainer: document.getElementById("video_list"),
       slidesContainer: document.getElementById("slides_container"),
       dotsContainer: document.getElementById("dots_container"),
+      calmSpaceButton: document.getElementById("menu_calmspace"),
+      calmSpacePage: document.getElementById("calmspace_page"),
+      communityWallButton: document.getElementById("menu_communitywall"),
+      communityWallPage: document.getElementById("community_wall_page"),
     };
   }
 
@@ -208,13 +212,14 @@ document.addEventListener("DOMContentLoaded", () => {
           "#harapan_display .flex-row"
         );
         if (pointsContainer && pointsContainer.childNodes.length > 2) {
-          pointsContainer.childNodes[2].nodeValue = ` ${
+          pointsContainer.childNodes[1].nodeValue = ` ${
             localUserData.poin ?? 0
           } `;
         }
       },
       updateProfilePage: () => {
         const nameElement = document.getElementById("name");
+        const name2Element = document.getElementById("name2");
         const poinElement = document.getElementById("profile_poin_display");
         const emailElement = document.getElementById("email");
         const genderIconElement = document.getElementById("gender_icon");
@@ -222,6 +227,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const ageElement = document.getElementById("age");
         if (
           !nameElement ||
+          !name2Element ||
           !poinElement ||
           !emailElement ||
           !genderIconElement ||
@@ -230,7 +236,8 @@ document.addEventListener("DOMContentLoaded", () => {
         )
           return;
         nameElement.textContent = localUserData.name || "Nama Pengguna";
-        poinElement.textContent = `${localUserData.poin || 0} Poin`;
+        name2Element.textContent = localUserData.name || "Nama Pengguna";
+        poinElement.textContent = `${localUserData.poin || 0} Harapan`;
         emailElement.textContent = localUserData.email || "";
         genderElement.textContent = localUserData.gender || "Belum diatur";
         if (localUserData.tanggalLahir) {
@@ -271,7 +278,7 @@ document.addEventListener("DOMContentLoaded", () => {
       },
       showCompletionPopup: (mission) => {
         if (!DOMElements.popup || !DOMElements.popupMessage) return;
-        DOMElements.popupMessage.textContent = `Selamat! Anda menyelesaikan "${mission.name}" dan mendapatkan +${mission.points} Poin & +${mission.rewards.xp} XP.`;
+        DOMElements.popupMessage.textContent = `Selamat! Kamu udah nyelesain "${mission.name}" dan dapat +${mission.points} Poin Harapan & +${mission.rewards.xp} XP.`;
         DOMElements.popup.classList.remove("hidden");
       },
       hideCompletionPopup: () => {
@@ -409,7 +416,7 @@ document.addEventListener("DOMContentLoaded", () => {
           updates.xp = newXp;
           updates.xpForNextLevel = newXpForNextLevel;
           setTimeout(
-            () => alert(`🎉 Selamat! Anda naik ke Level ${newLevel}!`),
+            () => alert(`🎉 Selamat! Kamu naik ke Level ${newLevel}!`),
             500
           );
         }
@@ -549,7 +556,7 @@ document.addEventListener("DOMContentLoaded", () => {
               UIManager.updatePointsDisplay();
               FeatureManager.renderAllMissions(allMissions);
             } else {
-              alert("Gagal menyelesaikan misi. Coba lagi.");
+              alert("Gagal selesain misi. Coba lagi yuk.");
               finishButton.disabled = false;
               finishButton.textContent = "Selesai";
             }
@@ -646,11 +653,11 @@ document.addEventListener("DOMContentLoaded", () => {
                       player.name
                     } ${medal} ${player.isVerified ? verifiedIcon : ""}</span>
                 </div>
-                <div class="ml-auto text-right">
+                <div class="ml-auto mr-1 text-right">
                     <span class="font-bold text-lg text-amber-800">${
                       player.poin ?? 0
                     }</span>
-                    <span class="text-xs text-gray-500 block">Poin</span>
+                    <span class="text-xs text-gray-500 block">Harapan</span>
                 </div>
             `;
             DOMElements.leaderboardContainer.appendChild(playerEntry);
@@ -936,6 +943,7 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         } else {
           if (typeof google !== "undefined" && google.accounts?.id) {
+            localStorage.removeItem("lastSplashTime");
             google.accounts.id.initialize({
               client_id: GOOGLE_CLIENT_ID,
               callback: LogicHandler.handleCredentialResponse,
@@ -978,10 +986,11 @@ document.addEventListener("DOMContentLoaded", () => {
         LogicHandler.navigateTo(button.dataset.target)
       );
     });
-    if (DOMElements.backButton)
-      DOMElements.backButton.addEventListener("click", () =>
+    DOMElements.backButton?.forEach((button) => {
+      button.addEventListener("click", () =>
         LogicHandler.navigateTo("homepage")
       );
+    });
     if (DOMElements.closePopupButton)
       DOMElements.closePopupButton.addEventListener(
         "click",
@@ -1053,6 +1062,14 @@ document.addEventListener("DOMContentLoaded", () => {
         DOMElements.imageUploadInput.value = "";
         DOMElements.imagePreview.src = "";
         DOMElements.imagePreviewContainer.classList.add("hidden");
+      });
+    if (DOMElements.calmSpaceButton)
+      DOMElements.calmSpaceButton.addEventListener("click", () => {
+        LogicHandler.navigateTo("calmspace_page");
+      });
+    if (DOMElements.communityWallButton)
+      DOMElements.communityWallButton.addEventListener("click", () => {
+        LogicHandler.navigateTo("community_wall_page");
       });
   }
 
