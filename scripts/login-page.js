@@ -103,7 +103,7 @@ function setupFunctions() {
       try {
         const userDocRef = doc(db, "users", user.uid);
         await setDoc(userDocRef, profileData, { merge: true });
-        window.location.href = "../sadar_dev.html";
+        window.location.href = "https://sadarbisa.blogspot.com";
       } catch (error) {
         console.error("Error saat menyimpan profil: ", error);
         UIManager.showProfileForm();
@@ -190,3 +190,4 @@ document.addEventListener("DOMContentLoaded", () => {
   // 4. Pasang event listener
   DOMElements.form.addEventListener("submit", LogicHandler.handleSaveProfile);
 });
+
