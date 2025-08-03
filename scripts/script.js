@@ -322,13 +322,13 @@ onAuthStateChanged(auth, async (user) => {
       generateLeaderboard();
     } else {
       console.error("Data pengguna tidak ditemukan di Firestore!");
-      window.location.href = "./other-features/login-page.html"; // Redirect jika data tidak ada
+      window.location.href = "/sadar-login.html"; // Redirect jika data tidak ada
     }
   } else {
     console.log(
       "Tidak ada pengguna yang login. Mengarahkan ke halaman login..."
     );
-    window.location.href = "./other-features/login-page.html"; // Redirect jika tidak login
+    window.location.href = "/sadar-login.html"; // Redirect jika tidak login
   }
 });
 
