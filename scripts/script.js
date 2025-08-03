@@ -322,13 +322,13 @@ onAuthStateChanged(auth, async (user) => {
       generateLeaderboard();
     } else {
       console.error("Data pengguna tidak ditemukan di Firestore!");
-      window.location.href = "https://sadarbisa.blogspot.com/sadar-login.html"; // Redirect jika data tidak ada
+      window.location.href = "https://sadarbisa.blogspot.com/p/sadar-login.html"; // Redirect jika data tidak ada
     }
   } else {
     console.log(
       "Tidak ada pengguna yang login. Mengarahkan ke halaman login..."
     );
-    window.location.href = "https://sadarbisa.blogspot.com/sadar-login.html"; // Redirect jika tidak login
+    window.location.href = "https://sadarbisa.blogspot.com/p/sadar-login.html"; // Redirect jika tidak login
   }
 });
 
@@ -401,7 +401,7 @@ if (logoutButton) {
         // Logout berhasil.
         console.log("Pengguna berhasil logout.");
         // Arahkan kembali ke halaman login.
-        window.location.href = "https://sadarbisa.blogspot.com/sadar-login.html";
+        window.location.href = "https://sadarbisa.blogspot.com/p/sadar-login.html";
       })
       .catch((error) => {
         // Terjadi error saat logout.
