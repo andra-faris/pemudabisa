@@ -45,6 +45,17 @@ import {
   increment,
   arrayUnion,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const firebaseConfig = {
+  apiKey: "AIzaSyAemm2qCSpMkJwHYeFqmBUl6eANKO66-dc",
+  authDomain: "sadar-by-bisa.firebaseapp.com",
+  projectId: "sadar-by-bisa",
+  storageBucket: "sadar-by-bisa.firebasestorage.app",
+  messagingSenderId: "115946460349",
+  appId: "1:115946460349:web:a5f7eb27c98f7a34ac53d4",
+};
+const GOOGLE_CLIENT_ID =
+  "115946460349-n6vhst1jhcdhhpk9e3tqigefmerv6bpu.apps.googleusercontent.com";
+
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
