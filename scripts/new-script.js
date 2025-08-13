@@ -1104,7 +1104,10 @@ document.addEventListener("DOMContentLoaded", () => {
             // Ambil ID Token terbaru dari pengguna yang sedang login
             const idToken = await user.getIdToken();
             // Buka halaman petku di tab baru dengan token di URL
-            window.open(`petku.html?token=${idToken}`, "_blank");
+            window.open(
+              `https://petku-sadar.pemudabisa.com/?token=${idToken}`,
+              "_blank"
+            );
           } catch (error) {
             console.error("Gagal mendapatkan token:", error);
             alert("Gagal membuka halaman Petku, silakan coba lagi.");
