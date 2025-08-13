@@ -19,7 +19,12 @@ import {
   serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// <!-- #region Initialization -->
+console.log("petku.js: Skrip dimulai.");
+
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("petku.js: DOMContentLoaded - Halaman HTML siap.");
+  
+  // <!-- #region Initialization -->
   const firebaseConfig = {
     apiKey: "AIzaSyAemm2qCSpMkJwHYeFqmBUl6eANKO66-dc",
     authDomain: "sadar-by-bisa.firebaseapp.com",
@@ -35,9 +40,6 @@ import {
   const db = getFirestore(app);
   let localUserData = {};
   // <!-- #endregion -->
-
-
-document.addEventListener("DOMContentLoaded", () => {
 
   // <!-- #region Pet Acts -->
   const pet = document.getElementById("the_pet");
@@ -121,8 +123,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Mulai siklus perilaku pet
-  //setPetState("idle"); // Atur status awal
-  //setInterval(decideNextAction, 5000); // Pilih aksi baru setiap 5 detik
+  setPetState("idle"); // Atur status awal
+  setInterval(decideNextAction, 5000); // Pilih aksi baru setiap 5 detik
   // <!-- #endregion -->
 
   // <!-- #region Shop & Inventory -->
@@ -293,6 +295,8 @@ document.addEventListener("DOMContentLoaded", () => {
    * @param {'foods' | 'drinks'} itemType - Tipe item yang ingin ditampilkan.
    */
   const showInventory = async (itemType) => {
+    console.log(`petku.js: showInventory - Dipanggil untuk tipe: ${itemType}`);
+
     // Pastikan semua elemen yang dibutuhkan ada
     if (!inventoryItemsGrid || !inventoryTitle || !inventoryPanel) return;
 
@@ -542,6 +546,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // <!-- #endregion -->
 
   function initializeEventListeners() {
+    console.log(
+      "petku.js: initializeEventListeners - MEMASANG SEMUA EVENT LISTENER..."
+    );
+
     // Listener untuk aksi pet
     if (pet) pet.addEventListener("click", () => setPetState("jump"));
     foodImage.addEventListener("click", () => setPetState("jump"));
@@ -813,12 +821,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
   onAuthStateChanged(auth, async (user) => {
     if (user) {
+      console.log(
+        "petku.js: onAuthStateChanged - Pengguna terdeteksi:",
+        user.uid
+      );
       console.log("Pengguna login:", user.uid);
       const userDocRef = doc(db, "users", user.uid);
       const docSnap = await getDoc(userDocRef);
 
       if (docSnap.exists()) {
         localUserData = docSnap.data();
+        console.log(
+          "petku.js: onAuthStateChanged - localUserData berhasil dimuat:",
+          localUserData
+        );
 
         if (!localUserData.petName || !localUserData.petUrl) {
           console.log(
@@ -872,26 +888,20 @@ document.addEventListener("DOMContentLoaded", () => {
             });
             // Perbarui data lokal setelah berhasil menyimpan ke server
             localUserData.petStats = initialPetStats;
-            
           } catch (error) {}
         }
 
         // Setelah data siap, pasang semua event listener
         initializeEventListeners();
-
-        // 3. BARU SETELAH SEMUANYA SIAP, HIDUPKAN PERILAKU PET
-            setPetState('idle');
-            setInterval(decideNextAction, 7000); // Pilih aksi baru setiap 7 detik
-            setInterval(() => {
-                if (currentState === 'walk') {
-                    movePet();
-                }
-            }, 5000);
-        
       } else {
+        console.error(
+          "petku.js: onAuthStateChanged - GAGAL, data pengguna tidak ditemukan di Firestore!"
+        );
       }
     } else {
+      console.warn(
+        "petku.js: onAuthStateChanged - Tidak ada pengguna yang login."
+      );
     }
   });
 });
-
