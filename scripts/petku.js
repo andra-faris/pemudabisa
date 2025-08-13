@@ -19,8 +19,7 @@ import {
   serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-document.addEventListener("DOMContentLoaded", () => {
-  // <!-- #region Initialization -->
+// <!-- #region Initialization -->
   const firebaseConfig = {
     apiKey: "AIzaSyAemm2qCSpMkJwHYeFqmBUl6eANKO66-dc",
     authDomain: "sadar-by-bisa.firebaseapp.com",
@@ -36,6 +35,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const db = getFirestore(app);
   let localUserData = {};
   // <!-- #endregion -->
+
+
+document.addEventListener("DOMContentLoaded", () => {
 
   // <!-- #region Pet Acts -->
   const pet = document.getElementById("the_pet");
@@ -119,8 +121,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Mulai siklus perilaku pet
-  setPetState("idle"); // Atur status awal
-  setInterval(decideNextAction, 5000); // Pilih aksi baru setiap 5 detik
+  //setPetState("idle"); // Atur status awal
+  //setInterval(decideNextAction, 5000); // Pilih aksi baru setiap 5 detik
   // <!-- #endregion -->
 
   // <!-- #region Shop & Inventory -->
@@ -870,14 +872,26 @@ document.addEventListener("DOMContentLoaded", () => {
             });
             // Perbarui data lokal setelah berhasil menyimpan ke server
             localUserData.petStats = initialPetStats;
+            
           } catch (error) {}
         }
 
         // Setelah data siap, pasang semua event listener
         initializeEventListeners();
+
+        // 3. BARU SETELAH SEMUANYA SIAP, HIDUPKAN PERILAKU PET
+            setPetState('idle');
+            setInterval(decideNextAction, 7000); // Pilih aksi baru setiap 7 detik
+            setInterval(() => {
+                if (currentState === 'walk') {
+                    movePet();
+                }
+            }, 5000);
+        
       } else {
       }
     } else {
     }
   });
 });
+
