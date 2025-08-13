@@ -818,6 +818,27 @@ function initPetkuApp() {
 
   // --- Bagian E: Alur Utama Pengecekan Autentikasi ---
   // Ini adalah "jantung" aplikasi Anda.
+  const signInWithToken = async (token) => {
+    try {
+      const credential = GoogleAuthProvider.credential(token);
+      await signInWithCredential(auth, credential);
+      // Setelah ini, onAuthStateChanged akan otomatis terpicu dengan data pengguna
+    } catch (error) {
+      console.error("Login dengan token gagal:", error);
+      // Jika token tidak valid, tampilkan pesan error
+      document.body.innerHTML =
+        '<div class="w-screen h-screen flex items-center justify-center"><p class="text-red-500">Sesi tidak valid atau telah kedaluwarsa. Silakan kembali ke aplikasi utama dan coba lagi.</p></div>';
+    }
+  };
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const token = urlParams.get("token");
+
+  if (token) {
+    // Jika ada token di URL, coba login dengannya
+    signInWithToken(token);
+  }
+
   onAuthStateChanged(auth, async (user) => {
     if (user) {
       console.log("onAuthStateChanged: Pengguna terdeteksi:", user.uid);
@@ -848,13 +869,13 @@ function initPetkuApp() {
         console.error(
           "onAuthStateChanged: Data pengguna tidak ada di Firestore. Mengarahkan ke login..."
         );
-        //window.location.href = "https://sadar.pemudabisa.com"; // Ganti dengan path login Anda
+        window.location.href = "https://sadar.pemudabisa.com"; // Ganti dengan path login Anda
       }
-    } else {
+    } else if (!token) {
       console.warn(
         "onAuthStateChanged: Tidak ada pengguna yang login. Mengarahkan ke login..."
       );
-      //window.location.href = "https://sadar.pemudabisa.com"; // Ganti dengan path login Anda
+      window.location.href = "https://sadar.pemudabisa.com"; // Ganti dengan path login Anda
     }
   });
 }

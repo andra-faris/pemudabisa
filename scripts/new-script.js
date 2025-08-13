@@ -21,6 +21,7 @@ import {
   orderBy,
   getDocs,
   doc,
+  addDoc,
   getDoc,
   setDoc,
   updateDoc,
@@ -152,6 +153,8 @@ document.addEventListener("DOMContentLoaded", () => {
       calmSpacePage: document.getElementById("calmspace_page"),
       communityWallButton: document.getElementById("menu_communitywall"),
       communityWallPage: document.getElementById("community_wall_page"),
+      petkuButton: document.getElementById("menu_petku"),
+      petkuPage: document.getElementById("petku_page"),
     };
   }
 
@@ -935,6 +938,28 @@ document.addEventListener("DOMContentLoaded", () => {
                 completedMissionsToday: [],
                 lastLoginDate: null,
                 isVerified: false,
+
+                // DITAMBAHKAN: Status peliharaan awal
+                petStats: {
+                  health: 100,
+                  hunger: 100,
+                  thirst: 100,
+                  happiness: 100,
+                  cleanliness: 100,
+                },
+                lastPetUpdate: serverTimestamp(), // Waktu update terakhir
+
+                // Inventaris & Misi
+                inventory: {},
+                completedMissionsToday: [],
+                lastLoginDate: null,
+                lastPostTimestamp: null,
+                petUrl: null,
+                petName: "Pet",
+
+                settings: {
+                  bgmOn: false,
+                },
               };
               await setDoc(doc(db, "users", user.uid), initialUserData);
             }
@@ -1070,6 +1095,23 @@ document.addEventListener("DOMContentLoaded", () => {
     if (DOMElements.communityWallButton)
       DOMElements.communityWallButton.addEventListener("click", () => {
         LogicHandler.navigateTo("community_wall_page");
+      });
+    if (DOMElements.petkuButton)
+      DOMElements.petkuButton.addEventListener("click", async () => {
+        const user = auth.currentUser;
+        if (user) {
+          try {
+            // Ambil ID Token terbaru dari pengguna yang sedang login
+            const idToken = await user.getIdToken();
+            // Buka halaman petku di tab baru dengan token di URL
+            window.open(`petku.html?token=${idToken}`, "_blank");
+          } catch (error) {
+            console.error("Gagal mendapatkan token:", error);
+            alert("Gagal membuka halaman Petku, silakan coba lagi.");
+          }
+        } else {
+          alert("Anda harus login untuk mengakses halaman Petku.");
+        }
       });
   }
 
