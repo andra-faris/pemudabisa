@@ -900,6 +900,7 @@ document.addEventListener("DOMContentLoaded", () => {
       },
     };
   }
+  
 
   function runSplashAndApp() {
     const SPLASH_TIMEOUT_MS = 1 * 60 * 60 * 1000; // 1 Jam
@@ -1098,23 +1099,11 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     if (DOMElements.petkuButton)
       DOMElements.petkuButton.addEventListener("click", async () => {
-        const user = auth.currentUser;
-        if (user) {
-          try {
-            // Ambil ID Token terbaru dari pengguna yang sedang login
-            const idToken = await user.getIdToken();
-            // Buka halaman petku di tab baru dengan token di URL
-            window.open(
-              `https://petku-sadar.pemudabisa.com/?token=${idToken}`,
+        window.open(
+              `https://petku-sadar.pemudabisa.com`,
               "_blank"
             );
-          } catch (error) {
-            console.error("Gagal mendapatkan token:", error);
-            alert("Gagal membuka halaman Petku, silakan coba lagi.");
-          }
-        } else {
-          alert("Anda harus login untuk mengakses halaman Petku.");
-        }
+        const user = auth.currentUser;
       });
   }
 
@@ -1140,3 +1129,4 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Langkah D: Jalankan Alur Aplikasi ---
   runSplashAndApp();
 });
+
