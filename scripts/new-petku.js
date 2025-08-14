@@ -159,11 +159,13 @@ function initPetkuApp() {
     // --- Langkah 2: Terapkan Animasi & Item Baru ---
     switch (state) {
       case "idle":
+        DOMElements.petContainer.classList.remove("pet-container-bob");
         DOMElements.pet.classList.add("pet-idle");
         break;
 
       case "walk":
         DOMElements.pet.classList.add("pet-walk");
+        DOMElements.petContainer.classList.add("pet-container-bob");
         // Untuk animasi yang berulang, kita atur kembali ke idle via setInterval di luar
         break;
 
