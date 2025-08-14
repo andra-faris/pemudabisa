@@ -6,7 +6,7 @@ import {
   signOut,
   GoogleAuthProvider,
   signInWithPopup,
-  signInWithCredential
+  signInWithCredential,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
   getFirestore,
@@ -44,7 +44,7 @@ function initPetkuApp() {
   const db = getFirestore(app);
 
   const GOOGLE_CLIENT_ID =
-  "115946460349-n6vhst1jhcdhhpk9e3tqigefmerv6bpu.apps.googleusercontent.com";
+    "115946460349-n6vhst1jhcdhhpk9e3tqigefmerv6bpu.apps.googleusercontent.com";
 
   // --- Bagian B: State & Referensi DOM ---
   let localUserData = {};
@@ -124,8 +124,8 @@ function initPetkuApp() {
     bgmToggle: document.getElementById("bgm-toggle"),
     iconMute: document.getElementById("icon_mute"),
     iconUnmute: document.getElementById("icon_unmute"),
-    loginOverlay: document.getElementById('login-overlay'),
-    gsiButtonContainer: document.getElementById('gsi-button-container'),
+    loginOverlay: document.getElementById("login-overlay"),
+    gsiButtonContainer: document.getElementById("gsi-button-container"),
   };
 
   // --- Bagian C: Definisi Semua Fungsi Helper ---
@@ -649,22 +649,22 @@ function initPetkuApp() {
       DOMElements.petMenuPopup.classList.add("hidden");
   };
 
-
   const handleCredentialResponse = async (response) => {
     // Tampilkan loading saat Firebase memproses login
-    DOMElements.loginOverlay.innerHTML = '<p class="text-gray-600">Memverifikasi...</p>';
+    DOMElements.loginOverlay.innerHTML =
+      '<p class="text-gray-600">Memverifikasi...</p>';
 
     const idToken = response.credential;
     const credential = GoogleAuthProvider.credential(idToken);
     try {
-        await signInWithCredential(auth, credential);
-        // Setelah berhasil, onAuthStateChanged akan otomatis terpicu lagi
-        // dan menjalankan alur untuk pengguna yang sudah login.
+      await signInWithCredential(auth, credential);
+      // Setelah berhasil, onAuthStateChanged akan otomatis terpicu lagi
+      // dan menjalankan alur untuk pengguna yang sudah login.
     } catch (error) {
-        console.error("Gagal login dengan kredensial GSI:", error);
-        alert("Terjadi kesalahan saat login. Silakan coba lagi.");
-        // Muat ulang untuk memulai kembali proses
-        window.location.reload();
+      console.error("Gagal login dengan kredensial GSI:", error);
+      alert("Terjadi kesalahan saat login. Silakan coba lagi.");
+      // Muat ulang untuk memulai kembali proses
+      window.location.reload();
     }
   };
 
@@ -867,8 +867,10 @@ function initPetkuApp() {
   }
 
   onAuthStateChanged(auth, async (user) => {
+    const user = auth.currentUser;
     if (user) {
-      if (DOMElements.loginOverlay) loginOverlay.classList.add('hidden');
+      if (DOMElements.loginOverlay)
+        DOMElements.loginOverlay.classList.add("hidden");
       console.log("onAuthStateChanged: Pengguna terdeteksi:", user.uid);
       const userDocRef = doc(db, "users", user.uid);
       const docSnap = await getDoc(userDocRef);
@@ -903,28 +905,24 @@ function initPetkuApp() {
       console.warn(
         "onAuthStateChanged: Tidak ada pengguna yang login. Mengarahkan ke login..."
       );
-      if (DOMElements.loginOverlay) DOMElements.loginOverlay.classList.remove('hidden');
-        
-        if (typeof google !== 'undefined' && google.accounts?.id) {
-            google.accounts.id.initialize({
-                client_id: GOOGLE_CLIENT_ID, // Pastikan variabel ini ada
-                callback: handleCredentialResponse
-            });
-            // Render tombol GSI di dalam wadah yang sudah disiapkan
-            google.accounts.id.renderButton(DOMElements.gsiButtonContainer, {
-                theme: "outline",
-                size: "large",
-                shape: "pill",
-                text: "continue_with"
-            });
-        }
+      if (DOMElements.loginOverlay)
+        DOMElements.loginOverlay.classList.remove("hidden");
+
+      if (typeof google !== "undefined" && google.accounts?.id) {
+        google.accounts.id.initialize({
+          client_id: GOOGLE_CLIENT_ID, // Pastikan variabel ini ada
+          callback: handleCredentialResponse,
+        });
+        // Render tombol GSI di dalam wadah yang sudah disiapkan
+        google.accounts.id.renderButton(DOMElements.gsiButtonContainer, {
+          theme: "outline",
+          size: "large",
+          shape: "pill",
+          text: "continue_with",
+        });
+      }
       //startLoginProcess();
       //window.location.href = "https://sadar.pemudabisa.com"; // Ganti dengan path login Anda
     }
   });
 }
-
-
-
-
-
