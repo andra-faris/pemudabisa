@@ -643,6 +643,17 @@ function initPetkuApp() {
       DOMElements.petMenuPopup.classList.add("hidden");
   };
 
+  const startLoginProcess = () => {
+    const provider = new GoogleAuthProvider();
+    // Popup ini akan muncul, tetapi seringkali langsung tertutup
+    // karena Google mendeteksi sesi yang sudah ada.
+    signInWithPopup(auth, provider)
+        .catch(error => {
+            console.error("Login popup error:", error);
+            document.body.innerHTML = `<div class="w-screen h-screen flex items-center justify-center"><p class="text-red-500">Gagal memulai sesi. Silakan coba lagi dari aplikasi utama.</p></div>`;
+        });
+  };
+
   // --- Bagian D: Fungsi Pemasangan Event Listener ---
   function initializeEventListeners() {
     console.log("Memasang semua event listener...");
@@ -873,12 +884,14 @@ function initPetkuApp() {
         );
         window.location.href = "https://sadar.pemudabisa.com"; // Ganti dengan path login Anda
       }
-    } else if (!token) {
+    } else {
       console.warn(
         "onAuthStateChanged: Tidak ada pengguna yang login. Mengarahkan ke login..."
       );
-      window.location.href = "https://sadar.pemudabisa.com"; // Ganti dengan path login Anda
+      startLoginProcess();
+      //window.location.href = "https://sadar.pemudabisa.com"; // Ganti dengan path login Anda
     }
   });
 }
+
 
