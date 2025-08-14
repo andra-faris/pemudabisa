@@ -911,7 +911,7 @@ function initPetkuApp() {
                 callback: handleCredentialResponse
             });
             // Render tombol GSI di dalam wadah yang sudah disiapkan
-            google.accounts.id.renderButton(gsiButtonContainer, {
+            google.accounts.id.renderButton(DOMElements.gsiButtonContainer, {
                 theme: "outline",
                 size: "large",
                 shape: "pill",
@@ -923,6 +923,7 @@ function initPetkuApp() {
     }
   });
 }
+
 
 
 
