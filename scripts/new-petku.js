@@ -904,24 +904,28 @@ function initPetkuApp() {
       console.warn(
         "onAuthStateChanged: Tidak ada pengguna yang login. Mengarahkan ke login..."
       );
+
+      if (typeof google === "undefined" || !google.accounts?.id) {
+        console.error("Google GSI script belum siap.");
+        DOMElements.loginOverlay.innerHTML =
+          '<p class="text-red-500">Gagal memuat layanan login. Coba refresh.</p>';
+        return;
+      }
+
+      google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID, // Pastikan variabel ini ada
+        callback: handleCredentialResponse,
+      });
+      // Render tombol GSI di dalam wadah yang sudah disiapkan
+      google.accounts.id.renderButton(DOMElements.gsiButtonContainer, {
+        theme: "outline",
+        size: "large",
+        shape: "pill",
+        text: "continue_with",
+      });
+
       if (DOMElements.loginOverlay)
         DOMElements.loginOverlay.classList.remove("hidden");
-
-      if (typeof google !== "undefined" && google.accounts?.id) {
-        google.accounts.id.initialize({
-          client_id: GOOGLE_CLIENT_ID, // Pastikan variabel ini ada
-          callback: handleCredentialResponse,
-        });
-        // Render tombol GSI di dalam wadah yang sudah disiapkan
-        google.accounts.id.renderButton(DOMElements.gsiButtonContainer, {
-          theme: "outline",
-          size: "large",
-          shape: "pill",
-          text: "continue_with",
-        });
-      }
-      //startLoginProcess();
-      //window.location.href = "https://sadar.pemudabisa.com"; // Ganti dengan path login Anda
     }
   });
 }
