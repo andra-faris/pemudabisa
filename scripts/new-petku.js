@@ -867,7 +867,6 @@ function initPetkuApp() {
   }
 
   onAuthStateChanged(auth, async (user) => {
-    const user = auth.currentUser;
     if (user) {
       if (DOMElements.loginOverlay)
         DOMElements.loginOverlay.classList.add("hidden");
