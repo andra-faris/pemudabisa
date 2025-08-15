@@ -155,6 +155,13 @@ document.addEventListener("DOMContentLoaded", () => {
       communityWallPage: document.getElementById("community_wall_page"),
       petkuButton: document.getElementById("menu_petku"),
       petkuPage: document.getElementById("petku_page"),
+      articleViewerPopup: document.getElementById("article-viewer-popup"),
+      articleViewerImage: document.getElementById("article-viewer-image"),
+      articleViewerTitle: document.getElementById("article-viewer-title"),
+      articleViewerContent: document.getElementById("article-viewer-content"),
+      articleViewerCloseButton: document.getElementById(
+        "article-viewer-close-button"
+      ),
     };
   }
 
@@ -753,9 +760,22 @@ document.addEventListener("DOMContentLoaded", () => {
                 const selectedArticle = articles.find(
                   (art) => art.id === articleId
                 );
-                alert(
-                  `Judul: ${selectedArticle.title}\n\nKonten Lengkap:\n${selectedArticle.content}`
-                );
+                if (selectedArticle && DOMElements.articleViewerPopup) {
+                  // 1. Isi data ke dalam panel
+                  DOMElements.articleViewerImage.src =
+                    selectedArticle.thumbnailUrl;
+                  DOMElements.articleViewerTitle.textContent =
+                    selectedArticle.title;
+                  // Mengubah newline menjadi paragraf untuk tampilan yang lebih baik
+                  DOMElements.articleViewerContent.innerHTML =
+                    selectedArticle.content
+                      .split("\n")
+                      .map((paragraph) => `<p>${paragraph}</p>`)
+                      .join("");
+
+                  // 2. Tampilkan panel
+                  DOMElements.articleViewerPopup.classList.remove("hidden");
+                }
               });
             });
         } catch (error) {
@@ -900,7 +920,6 @@ document.addEventListener("DOMContentLoaded", () => {
       },
     };
   }
-  
 
   function runSplashAndApp() {
     const SPLASH_TIMEOUT_MS = 1 * 60 * 60 * 1000; // 1 Jam
@@ -1099,12 +1118,39 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     if (DOMElements.petkuButton)
       DOMElements.petkuButton.addEventListener("click", async () => {
-        window.open(
-              `https://petku-sadar.pemudabisa.com`,
+        const user = auth.currentUser;
+        if (user) {
+          try {
+            // Ambil ID Token terbaru dari pengguna yang sedang login
+            const idToken = await user.getIdToken();
+            // Buka halaman petku di tab baru dengan token di URL
+            window.open(
+              `https://petku-sadar.pemudabisa.com/?token=${idToken}`,
               "_blank"
             );
-        const user = auth.currentUser;
+          } catch (error) {
+            console.error("Gagal mendapatkan token:", error);
+            alert("Gagal membuka halaman Petku, silakan coba lagi.");
+          }
+        } else {
+          alert("Anda harus login untuk mengakses halaman Petku.");
+        }
       });
+
+    if (DOMElements.articleViewerCloseButton) {
+      DOMElements.articleViewerCloseButton.addEventListener("click", () => {
+        DOMElements.articleViewerPopup.classList.add("hidden");
+      });
+    }
+
+    // (Opsional) Menutup popup saat mengklik area latar belakang gelap
+    if (DOMElements.articleViewerPopup) {
+      DOMElements.articleViewerPopup.addEventListener("click", (event) => {
+        if (event.target === DOMElements.articleViewerPopup) {
+          DOMElements.articleViewerPopup.classList.add("hidden");
+        }
+      });
+    }
   }
 
   async function runAppFeatures() {
@@ -1129,4 +1175,3 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Langkah D: Jalankan Alur Aplikasi ---
   runSplashAndApp();
 });
-
