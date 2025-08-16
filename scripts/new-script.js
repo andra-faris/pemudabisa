@@ -918,6 +918,75 @@ document.addEventListener("DOMContentLoaded", () => {
           DOMElements.saveAvatarButton.disabled = false;
         }
       },
+      checkAndDisplayWeeklyQuestionary: async () => {
+        try {
+          // 1. Buat referensi ke dokumen yang ingin dicek
+          const settingsDocRef = doc(db, "super-settings", "weeklyQuestionary");
+
+          // 2. Ambil snapshot dokumen dari Firestore (proses ini ditunggu/await)
+          const docSnap = await getDoc(settingsDocRef);
+
+          // 3. Lakukan pengecekan kondisi
+          // Kondisi akan terpenuhi HANYA JIKA:
+          // a. Dokumennya ada (docSnap.exists() === true)
+          // b. Field 'weeklyQuestionary' di dalam dokumen itu bernilai true
+          if (docSnap.exists() && docSnap.data().weeklyQuestionary === true) {
+            console.log(
+              "Kondisi terpenuhi: Kuesioner mingguan sedang aktif. Menampilkan popup..."
+            );
+
+            // Cek apakah popup sudah ada untuk menghindari duplikasi
+            if (document.getElementById("weekly-questionary-popup")) return;
+
+            // ---MULAI LOGIKA PEMBUATAN POPUP---
+            const popupOverlay = document.createElement("div");
+            popupOverlay.id = "weekly-questionary-popup";
+            popupOverlay.style.cssText = `
+        position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.75);
+        display: flex; align-items: center; justify-content: center; z-index: 100;
+      `;
+
+            const formContainer = document.createElement("div");
+            formContainer.style.cssText = `
+        background-color: white; border-radius: 16px; width: 90%;
+        max-width: 550px; height: 90vh; display: flex; flex-direction: column;
+        overflow: hidden; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      `;
+
+            const googleFormIframe = document.createElement("iframe");
+            googleFormIframe.src =
+              "https://docs.google.com/forms/d/e/1FAIpQLSejfLkwI30QvmIl-AAtSZH8jRDnDdKOCiHe5reB5gRTy4wMjQ/viewform?embedded=true";
+            https: googleFormIframe.style.cssText = `flex-grow: 1; border: none;`;
+
+            const closeButton = document.createElement("button");
+            closeButton.textContent = "Tutup Kuesioner";
+            closeButton.style.cssText = `
+        padding: 14px 20px; border: none; background-color: #f59e0b;
+        color: white; font-weight: 600; cursor: pointer;
+      `;
+            closeButton.onclick = () => {
+              document.body.removeChild(popupOverlay);
+            };
+
+            formContainer.appendChild(googleFormIframe);
+            formContainer.appendChild(closeButton);
+            popupOverlay.appendChild(formContainer);
+            document.body.appendChild(popupOverlay);
+            // ---AKHIR LOGIKA PEMBUATAN POPUP---
+          } else {
+            // Ini akan berjalan jika dokumen tidak ada atau field-nya false/tidak ada
+            console.log(
+              "Kondisi tidak terpenuhi: Kuesioner mingguan tidak aktif saat ini."
+            );
+          }
+        } catch (error) {
+          // Tangani error jika gagal terhubung atau mengambil data dari Firestore
+          console.error(
+            "Terjadi error saat mengecek pengaturan kuesioner mingguan:",
+            error
+          );
+        }
+      },
     };
   }
 
@@ -1120,7 +1189,8 @@ document.addEventListener("DOMContentLoaded", () => {
       DOMElements.petkuButton.addEventListener("click", async () => {
         const user = auth.currentUser;
         if (user) {
-          window.open(`https://petku-sadar.pemudabisa.com`);
+          window.location.href("https://petku-sadar.pemudabisa.com");
+          //window.location(`https://petku-sadar.pemudabisa.com`);
         } else {
           alert("Anda harus login untuk mengakses halaman Petku.");
         }
@@ -1166,29 +1236,29 @@ document.addEventListener("DOMContentLoaded", () => {
       const popupOverlay = document.createElement("div");
       popupOverlay.id = "initial-questionary-popup";
       popupOverlay.style.cssText = `
-    position: fixed;
-    inset: 0;
-    background-color: rgba(0, 0, 0, 0.75);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-    padding: 16px;
-  `;
+      position: fixed;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.75);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 16px;
+    `;
 
       // 2. Buat kontainer untuk iframe (kotak putih di tengah)
       const formContainer = document.createElement("div");
       formContainer.style.cssText = `
-    background-color: white;
-    border-radius: 16px;
-    width: 100%;
-    max-width: 550px;
-    height: 90vh; /* Menggunakan 90% tinggi layar */
-    display: flex;
-    flex-direction: column;
-    overflow: hidden; /* Memastikan iframe tidak keluar dari border-radius */
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-  `;
+      background-color: white;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 550px;
+      height: 90vh; /* Menggunakan 90% tinggi layar */
+      display: flex;
+      flex-direction: column;
+      overflow: hidden; /* Memastikan iframe tidak keluar dari border-radius */
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    `;
 
       // 3. Buat elemen iframe untuk Google Form
       const googleFormIframe = document.createElement("iframe");
@@ -1196,22 +1266,22 @@ document.addEventListener("DOMContentLoaded", () => {
       googleFormIframe.src =
         "https://docs.google.com/forms/d/e/1FAIpQLSduiV-E43COsosg5GXP3D8zdcoEZKIwwMuo2onMEMpcFN1Jgw/viewform?embedded=true";
       https: googleFormIframe.style.cssText = `
-    flex-grow: 1; /* Membuat iframe mengisi ruang yang tersedia */
-    border: none;
-  `;
+      flex-grow: 1; /* Membuat iframe mengisi ruang yang tersedia */
+      border: none;
+    `;
 
       // 4. Buat tombol untuk menutup popup
       const closeButton = document.createElement("button");
       closeButton.textContent = "Tutup Kuesioner";
       closeButton.style.cssText = `
-    padding: 14px 20px;
-    border: none;
-    background-color: #d9534f; /* Warna merah untuk tombol tutup */
-    color: white;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s;
-  `;
+      padding: 14px 20px;
+      border: none;
+      background-color: #d9534f; /* Warna merah untuk tombol tutup */
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    `;
 
       // Efek hover sederhana untuk tombol
       closeButton.onmouseover = () => {
@@ -1252,86 +1322,8 @@ document.addEventListener("DOMContentLoaded", () => {
     /* #endregion */
 
     /* #region Kuesioner Mingguan Bagi User */
-    if (
-      localUserData.haveInitialQuestionary &&
-      !localUserData.haveWeeklyQuestionary
-    ) {
-      // 1. Buat elemen utama untuk popup overlay (latar belakang gelap)
-      const popupOverlay = document.createElement("div");
-      popupOverlay.id = "initial-questionary-popup";
-      popupOverlay.style.cssText = `
-    position: fixed;
-    inset: 0;
-    background-color: rgba(0, 0, 0, 0.45);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-    padding: 16px;
-  `;
-
-      // 2. Buat kontainer untuk iframe (kotak putih di tengah)
-      const formContainer = document.createElement("div");
-      formContainer.style.cssText = `
-    background-color: white;
-    border-radius: 16px;
-    width: 100%;
-    max-width: 550px;
-    height: 90vh; /* Menggunakan 90% tinggi layar */
-    display: flex;
-    flex-direction: column;
-    overflow: hidden; /* Memastikan iframe tidak keluar dari border-radius */
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-  `;
-
-      // 3. Buat elemen iframe untuk Google Form
-      const googleFormIframe = document.createElement("iframe");
-      // PENTING: Ganti URL ini dengan URL "embed" dari Google Form Anda
-      googleFormIframe.src =
-        "https://docs.google.com/forms/d/e/1FAIpQLSduiV-E43COsosg5GXP3D8zdcoEZKIwwMuo2onMEMpcFN1Jgw/viewform?embedded=true";
-      https: googleFormIframe.style.cssText = `
-    flex-grow: 1; /* Membuat iframe mengisi ruang yang tersedia */
-    border: none;
-  `;
-
-      // 4. Buat tombol untuk menutup popup
-      const closeButton = document.createElement("button");
-      closeButton.textContent = "Tutup Kuesioner";
-      closeButton.style.cssText = `
-    padding: 14px 20px;
-    border: none;
-    background-color: #d9534f; /* Warna merah untuk tombol tutup */
-    color: white;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s;
-  `;
-
-      // Efek hover sederhana untuk tombol
-      closeButton.onmouseover = () => {
-        closeButton.style.backgroundColor = "#c9302c";
-      };
-      closeButton.onmouseout = () => {
-        closeButton.style.backgroundColor = "#d9534f";
-      };
-
-      // 5. Tambahkan fungsi pada tombol untuk menghapus popup dari DOM
-      // closeButton.onclick = () => {
-      //   // Saat tombol ditutup, kita hapus seluruh elemen overlay dari body
-      //   document.body.removeChild(popupOverlay);
-      // };
-      closeButton.addEventListener("click", () => {
-        // Saat tombol ditutup, kita hapus seluruh elemen overlay dari body
-        document.body.removeChild(popupOverlay);
-      });
-
-      // 6. Susun semua elemen menjadi satu kesatuan
-      formContainer.appendChild(googleFormIframe);
-      formContainer.appendChild(closeButton);
-      popupOverlay.appendChild(formContainer);
-
-      // 7. Tampilkan popup dengan menambahkannya ke body dokumen
-      document.body.appendChild(popupOverlay);
+    if (localUserData.haveInitialQuestionary) {
+      FeatureManager.checkAndDisplayWeeklyQuestionary();
     }
     /* #endregion */
   }
