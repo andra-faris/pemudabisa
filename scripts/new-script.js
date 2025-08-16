@@ -1120,18 +1120,7 @@ document.addEventListener("DOMContentLoaded", () => {
       DOMElements.petkuButton.addEventListener("click", async () => {
         const user = auth.currentUser;
         if (user) {
-          try {
-            // Ambil ID Token terbaru dari pengguna yang sedang login
-            const idToken = await user.getIdToken();
-            // Buka halaman petku di tab baru dengan token di URL
-            window.open(
-              `https://petku-sadar.pemudabisa.com/?token=${idToken}`,
-              "_blank"
-            );
-          } catch (error) {
-            console.error("Gagal mendapatkan token:", error);
-            alert("Gagal membuka halaman Petku, silakan coba lagi.");
-          }
+          window.open(`https://petku-sadar.pemudabisa.com`);
         } else {
           alert("Anda harus login untuk mengakses halaman Petku.");
         }
@@ -1170,6 +1159,181 @@ document.addEventListener("DOMContentLoaded", () => {
     FeatureManager.checkPostEligibility();
     FeatureManager.generateRandomArticles();
     FeatureManager.generateDynamicVideos();
+
+    /* #region Kuesioner Awal Bagi User yang Belum Pernah Mengisi */
+    if (!localUserData.haveInitialQuestionary) {
+      // 1. Buat elemen utama untuk popup overlay (latar belakang gelap)
+      const popupOverlay = document.createElement("div");
+      popupOverlay.id = "initial-questionary-popup";
+      popupOverlay.style.cssText = `
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 16px;
+  `;
+
+      // 2. Buat kontainer untuk iframe (kotak putih di tengah)
+      const formContainer = document.createElement("div");
+      formContainer.style.cssText = `
+    background-color: white;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 550px;
+    height: 90vh; /* Menggunakan 90% tinggi layar */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Memastikan iframe tidak keluar dari border-radius */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  `;
+
+      // 3. Buat elemen iframe untuk Google Form
+      const googleFormIframe = document.createElement("iframe");
+      // PENTING: Ganti URL ini dengan URL "embed" dari Google Form Anda
+      googleFormIframe.src =
+        "https://docs.google.com/forms/d/e/1FAIpQLSduiV-E43COsosg5GXP3D8zdcoEZKIwwMuo2onMEMpcFN1Jgw/viewform?embedded=true";
+      https: googleFormIframe.style.cssText = `
+    flex-grow: 1; /* Membuat iframe mengisi ruang yang tersedia */
+    border: none;
+  `;
+
+      // 4. Buat tombol untuk menutup popup
+      const closeButton = document.createElement("button");
+      closeButton.textContent = "Tutup Kuesioner";
+      closeButton.style.cssText = `
+    padding: 14px 20px;
+    border: none;
+    background-color: #d9534f; /* Warna merah untuk tombol tutup */
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  `;
+
+      // Efek hover sederhana untuk tombol
+      closeButton.onmouseover = () => {
+        closeButton.style.backgroundColor = "#c9302c";
+      };
+      closeButton.onmouseout = () => {
+        closeButton.style.backgroundColor = "#d9534f";
+      };
+
+      // 5. Tambahkan fungsi pada tombol untuk menghapus popup dari DOM
+      //   closeButton.onclick = () => {
+      //     // Saat tombol ditutup, kita hapus seluruh elemen overlay dari body
+      //     document.body.removeChild(popupOverlay);
+
+      //     /* CATATAN PENGEMBANGAN:
+      //   Di sini Anda idealnya juga akan mengirim pembaruan ke Firestore
+      //   untuk mengatur `haveInitialQuestionary: true` agar popup ini tidak
+      //   muncul lagi untuk pengguna ini. Contoh:
+
+      //   const userDocRef = doc(db, "users", auth.currentUser.uid);
+      //   updateDoc(userDocRef, { haveInitialQuestionary: true });
+      // */
+      //   };
+
+      closeButton.addEventListener("click", () => {
+        // Saat tombol ditutup, kita hapus seluruh elemen overlay dari body
+        document.body.removeChild(popupOverlay);
+      });
+
+      // 6. Susun semua elemen menjadi satu kesatuan
+      formContainer.appendChild(googleFormIframe);
+      formContainer.appendChild(closeButton);
+      popupOverlay.appendChild(formContainer);
+
+      // 7. Tampilkan popup dengan menambahkannya ke body dokumen
+      document.body.appendChild(popupOverlay);
+    }
+    /* #endregion */
+
+    /* #region Kuesioner Mingguan Bagi User */
+    if (
+      localUserData.haveInitialQuestionary &&
+      !localUserData.haveWeeklyQuestionary
+    ) {
+      // 1. Buat elemen utama untuk popup overlay (latar belakang gelap)
+      const popupOverlay = document.createElement("div");
+      popupOverlay.id = "initial-questionary-popup";
+      popupOverlay.style.cssText = `
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 16px;
+  `;
+
+      // 2. Buat kontainer untuk iframe (kotak putih di tengah)
+      const formContainer = document.createElement("div");
+      formContainer.style.cssText = `
+    background-color: white;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 550px;
+    height: 90vh; /* Menggunakan 90% tinggi layar */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Memastikan iframe tidak keluar dari border-radius */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  `;
+
+      // 3. Buat elemen iframe untuk Google Form
+      const googleFormIframe = document.createElement("iframe");
+      // PENTING: Ganti URL ini dengan URL "embed" dari Google Form Anda
+      googleFormIframe.src =
+        "https://docs.google.com/forms/d/e/1FAIpQLSduiV-E43COsosg5GXP3D8zdcoEZKIwwMuo2onMEMpcFN1Jgw/viewform?embedded=true";
+      https: googleFormIframe.style.cssText = `
+    flex-grow: 1; /* Membuat iframe mengisi ruang yang tersedia */
+    border: none;
+  `;
+
+      // 4. Buat tombol untuk menutup popup
+      const closeButton = document.createElement("button");
+      closeButton.textContent = "Tutup Kuesioner";
+      closeButton.style.cssText = `
+    padding: 14px 20px;
+    border: none;
+    background-color: #d9534f; /* Warna merah untuk tombol tutup */
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  `;
+
+      // Efek hover sederhana untuk tombol
+      closeButton.onmouseover = () => {
+        closeButton.style.backgroundColor = "#c9302c";
+      };
+      closeButton.onmouseout = () => {
+        closeButton.style.backgroundColor = "#d9534f";
+      };
+
+      // 5. Tambahkan fungsi pada tombol untuk menghapus popup dari DOM
+      // closeButton.onclick = () => {
+      //   // Saat tombol ditutup, kita hapus seluruh elemen overlay dari body
+      //   document.body.removeChild(popupOverlay);
+      // };
+      closeButton.addEventListener("click", () => {
+        // Saat tombol ditutup, kita hapus seluruh elemen overlay dari body
+        document.body.removeChild(popupOverlay);
+      });
+
+      // 6. Susun semua elemen menjadi satu kesatuan
+      formContainer.appendChild(googleFormIframe);
+      formContainer.appendChild(closeButton);
+      popupOverlay.appendChild(formContainer);
+
+      // 7. Tampilkan popup dengan menambahkannya ke body dokumen
+      document.body.appendChild(popupOverlay);
+    }
+    /* #endregion */
   }
 
   // --- Langkah D: Jalankan Alur Aplikasi ---
